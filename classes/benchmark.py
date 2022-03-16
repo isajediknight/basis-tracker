@@ -330,6 +330,10 @@ class Benchmark:
     def get_microseconds_text(self):
         return self.microseconds_text
 
+    def get_runtime_seconds(self):
+        end_time = datetime.datetime.now()
+        return (end_time - self.begin_time).seconds
+
     def current_benchmark_without_stopping(self):
         """
         Print Current timings
