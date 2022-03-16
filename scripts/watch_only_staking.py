@@ -62,10 +62,6 @@ elif((OS_TYPE == 'windows')):
 from discord_webhook import *
 # < ---  End  Module Classes Import --- >
 
-#from discord_webhook import DiscordWebhook
-#webhook ID
-#https://discord.com/api/webhooks/953101017556336660/942Mm_yoH4UAKEvib59ZsD51KPFw7ucgGOibhtU3G4gVfLwFJsikyt87Nl1EB0XgqGX5
-
 # < --- Begin Custom Classes Import --- >
 # Custom Colors for printing to the screen
 from custom_colors import *
@@ -113,48 +109,70 @@ account_1 = Solana_Ledger(address_1)
 
 watching = ['rBasis','basis','usdc']#'USD Coin'
 
-for runs in range(0,5000):
-    result_1 = first_api_call.getAccountTokensJSON(address_1)
-    #print(result_1)
-    api_benchmark = Benchmark()
-    for i in range(len(result_1)):
-        #print(result_1[i]['tokenName'])
+try:
+    now_datetime = datetime.datetime.now()
+    right_now = str(now_datetime.strftime("%B")) + ' '
+    right_now += str(now_datetime.day) + ' '
+    right_now += str(now_datetime.hour) + ':'
+    right_now += str(now_datetime.minute) + ':'
+    right_now += str(now_datetime.second)
+    webhook = DiscordWebhook(url='HIDDEN',content='3S Monitoring Started: ' + right_now)
+    response = webhook.execute()
 
-        if result_1[i]['tokenName'] in watching:
-            TOKEN_NAME = result_1[i]['tokenName']
-            #print(result_1[i]['tokenName'] + ':' + str(int(result_1[i]['tokenAmount']['uiAmount'])))
-            account_1.add_data(TOKEN_NAME,int(result_1[i]['tokenAmount']['uiAmount']))
-            previous_difference = account_1.calc_compare_to_previous_amount(TOKEN_NAME)
+    for runs in range(0,10000):
+        result_1 = first_api_call.getAccountTokensJSON(address_1)
+        #print(result_1)
+        api_benchmark = Benchmark()
+        for i in range(len(result_1)):
+            #print(result_1[i]['tokenName'])
 
-            hours = str(datetime.datetime.now().hour)
-            minutes = str(datetime.datetime.now().minute)
-            seconds = str(datetime.datetime.now().second)
+            if result_1[i]['tokenName'] in watching:
+                TOKEN_NAME = result_1[i]['tokenName']
+                #print(result_1[i]['tokenName'] + ':' + str(int(result_1[i]['tokenAmount']['uiAmount'])))
+                account_1.add_data(TOKEN_NAME,int(result_1[i]['tokenAmount']['uiAmount']))
+                previous_difference = account_1.calc_compare_to_previous_amount(TOKEN_NAME)
 
-            previous_difference_str = Custom_String(previous_difference)
-            previous_difference_str.add_commas()
+                hours = str(datetime.datetime.now().hour)
+                minutes = str(datetime.datetime.now().minute)
+                seconds = str(datetime.datetime.now().second)
 
-            if(previous_difference > 0):
-                print(' ' + color_test.cc(addr_1_tracking,'orange') + '\t' +  TOKEN_NAME + '\t' + hours + ':' + minutes + ':' + seconds + '\t' + color_test.cc(previous_difference_str.get_string(),'green'))
-                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/HIDDEN',content='+' + previous_difference_str.get_string())
-                response = webhook.execute()
-            elif(previous_difference < 0):
-                webhook = DiscordWebhook(url='https://discord.com/api/webhooks/HIDDEN',content = previous_difference_str.get_string())
-                response = webhook.execute()
-                print(' ' + color_test.cc(addr_1_tracking,'orange') + '\t' + TOKEN_NAME + '\t' + hours + ':' + minutes + ':' + seconds + '\t' + color_test.cc(previous_difference_str.get_string(),'red'))
+                previous_difference_str = Custom_String(previous_difference)
+                previous_difference_str.add_commas()
 
-    api_benchmark.stop()
+                if(previous_difference > 0):
+                    print(' ' + color_test.cc(addr_1_tracking,'orange') + '\t' +  TOKEN_NAME + '\t' + hours + ':' + minutes + ':' + seconds + '\t' + color_test.cc(previous_difference_str.get_string(),'green'))
+                    webhook = DiscordWebhook(url='HIDDEN',content='+' + previous_difference_str.get_string())
+                    response = webhook.execute()
+                elif(previous_difference < 0):
+                    webhook = DiscordWebhook(url='HIDDEN',content = previous_difference_str.get_string())
+                    response = webhook.execute()
+                    print(' ' + color_test.cc(addr_1_tracking,'orange') + '\t' + TOKEN_NAME + '\t' + hours + ':' + minutes + ':' + seconds + '\t' + color_test.cc(previous_difference_str.get_string(),'red'))
 
-    #print(str(api_benchmark.get_runtime_seconds()))
+        api_benchmark.stop()
 
-    if(api_benchmark.get_runtime_seconds() >= 10):
-        text = api_benchmark.human_readable_string()
-        print(color_test.cc(' API Call took: ' + text,'yellow'))
-        webhook = DiscordWebhook(url='https://discord.com/api/webhooks/HIDDEN',content='API Call took: ' + text)
-        response = webhook.execute()
-    elif(api_benchmark.get_runtime_seconds() < 10 and api_benchmark.get_runtime_seconds() > -1):
-        time.sleep(10 - api_benchmark.get_runtime_seconds())
+        #print(str(api_benchmark.get_runtime_seconds()))
 
-    #print(" Run: " + str(runs))
+        if(api_benchmark.get_runtime_seconds() >= 10):
+            text = api_benchmark.human_readable_string()
+            print(color_test.cc(' API Call took: ' + text,'yellow'))
+            webhook = DiscordWebhook(url='HIDDEN',content='API Call took: ' + text)
+            response = webhook.execute()
+        elif(api_benchmark.get_runtime_seconds() < 10 and api_benchmark.get_runtime_seconds() > -1):
+            time.sleep(10 - api_benchmark.get_runtime_seconds())
+
+        #print(" Run: " + str(runs))
+except:
+    now_datetime = datetime.datetime.now()
+    right_now = now_datetime.month + ' '
+    right_now += now_datetime.day + ' '
+    right_now += now_datetime.hour + ':'
+    right_now += now_datetime.minute + ':'
+    right_now += now_datetime.second
+    webhook = DiscordWebhook(
+        url='HIDDEN',
+        content='3S Monitoring Stopped: ' + right_now)
+    response = webhook.execute()
+    print("SCRIPT ERRORED")
 
 begin_time.stop()
 print("\n Runtime: " + begin_time.human_readable_string())
