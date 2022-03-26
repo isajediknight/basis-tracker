@@ -2,7 +2,7 @@ import datetime
 
 class Solana_Ledger:
 
-    def __init__(self, solana_address=None, currencies=['USDC','basis','rBasis']):
+    def __init__(self, solana_address=None, currencies=['USDC','basis','rBasis','USD Coin']):
         self.solana_address = solana_address
     
         self.amount = {}
