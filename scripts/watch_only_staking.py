@@ -76,9 +76,9 @@ from solscanio import *
 from solana_ledger import *
 
 from custom_string import *
+
+from reusable_methods import get_webhook
 # < --- End Custom Classes Import --- >
-
-
 
 begin_time = Benchmark()
 
@@ -90,6 +90,8 @@ second_api_call = SolscanIO()
 # Hardcode Important Addresses to watch here - for easier trading out
 ADDRESS_ORCA = '786ezhfHqkmJUBmjrWYGpzPnVWR8zhy2V71qNws7D89z'
 ADDRESS_3S = 'HXCJ1tWowNNNUSrtoVnxT3y9ue1tkuaLNbFMM239zm1y'
+
+DISCORD_WEBHOOK_URL = get_webhook('3S')
 
 address_1 = ADDRESS_3S # ''# '3sBX8hj4URsiBCSRV26fEHkake295fQnM44EYKKsSs51'#'HXCJ1tWowNNNUSrtoVnxT3y9ue1tkuaLNbFMM239zm1y'
 #'2g4joCYzR3QA3SDypr6SJWzgnQX5xUpBF463rvJJfw78')
@@ -116,7 +118,7 @@ try:
     right_now += str(now_datetime.hour) + ':'
     right_now += str(now_datetime.minute) + ':'
     right_now += str(now_datetime.second)
-    webhook = DiscordWebhook(url='HIDDEN',content='3S Monitoring Started: ' + right_now)
+    webhook = DiscordWebhook(url=DISCORD_WEBHOOK_URL,content='3S Monitoring Started: ' + right_now)
     response = webhook.execute()
 
     for runs in range(0,10000):
@@ -141,10 +143,10 @@ try:
 
                 if(previous_difference > 0):
                     print(' ' + color_test.cc(addr_1_tracking,'orange') + '\t' +  TOKEN_NAME + '\t' + hours + ':' + minutes + ':' + seconds + '\t' + color_test.cc(previous_difference_str.get_string(),'green'))
-                    webhook = DiscordWebhook(url='HIDDEN',content='+' + previous_difference_str.get_string())
+                    webhook = DiscordWebhook(url=DISCORD_WEBHOOK_URL,content='+' + previous_difference_str.get_string())
                     response = webhook.execute()
                 elif(previous_difference < 0):
-                    webhook = DiscordWebhook(url='HIDDEN',content = previous_difference_str.get_string())
+                    webhook = DiscordWebhook(url=DISCORD_WEBHOOK_URL,content = previous_difference_str.get_string())
                     response = webhook.execute()
                     print(' ' + color_test.cc(addr_1_tracking,'orange') + '\t' + TOKEN_NAME + '\t' + hours + ':' + minutes + ':' + seconds + '\t' + color_test.cc(previous_difference_str.get_string(),'red'))
 
@@ -154,8 +156,8 @@ try:
 
         if(api_benchmark.get_runtime_seconds() >= 10):
             text = api_benchmark.human_readable_string()
-            print(color_test.cc(' API Call took: ' + text,'yellow'))
-            webhook = DiscordWebhook(url='HIDDEN',content='API Call took: ' + text)
+            print(color_test.cc('<3S> API Call took: ' + text,'yellow'))
+            webhook = DiscordWebhook(url=DISCORD_WEBHOOK_URL,content='API Call took: ' + text)
             response = webhook.execute()
         elif(api_benchmark.get_runtime_seconds() < 10 and api_benchmark.get_runtime_seconds() > -1):
             time.sleep(10 - api_benchmark.get_runtime_seconds())
@@ -163,14 +165,12 @@ try:
         #print(" Run: " + str(runs))
 except:
     now_datetime = datetime.datetime.now()
-    right_now = now_datetime.month + ' '
-    right_now += now_datetime.day + ' '
-    right_now += now_datetime.hour + ':'
-    right_now += now_datetime.minute + ':'
-    right_now += now_datetime.second
-    webhook = DiscordWebhook(
-        url='HIDDEN',
-        content='3S Monitoring Stopped: ' + right_now)
+    right_now = str(now_datetime.strftime("%B")) + ' '
+    right_now += str(now_datetime.day) + ' '
+    right_now += str(now_datetime.hour) + ':'
+    right_now += str(now_datetime.minute) + ':'
+    right_now += str(now_datetime.second)
+    webhook = DiscordWebhook(url=DISCORD_WEBHOOK_URL, content='3S Monitoring Stopped: ' + right_now)
     response = webhook.execute()
     print("SCRIPT ERRORED")
 
