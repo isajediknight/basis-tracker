@@ -30,21 +30,15 @@ class SolscanIO(object):
         return
 
     def getAccountTokens(self,sol_main_address):
-
         self.response = requests.get(self.uri + '/account/tokens?account=' + sol_main_address,headers = {"User-Agent": "Mozilla/5.0"})
-
         if(self.response.status_code == "200"):
             return self.response
         else:
             print(str(self.response.status_code))
 
-    def getAccountTokensJSON(self, sol_main_address):
+    def getAccountTokensJSON(self,sol_main_address):
         self.response = requests.get(self.uri + '/account/tokens?account=' + sol_main_address,headers={"User-Agent": "Mozilla/5.0"})
-        #print(self.response.json())
-        #print(self.uri + '/account/tokens?account=' + sol_main_address)
-        #self.response.close()
         if (self.response.status_code == "200" or self.response.status_code == 200):
-            #print(self.response.text)
             return self.response.json()
         else:
             print(str(self.response.status_code))
