@@ -1,5 +1,6 @@
 import datetime
 
+
 def find_all(a_str, sub):
     """
     Returns the indexes of {sub} where they were found in {a_str}.  The values
@@ -13,6 +14,33 @@ def find_all(a_str, sub):
         if start == -1: return
         yield start
         start += 1
+
+def add_commas(string):
+    negative_found = False
+    if('-' == string[0]):
+        negative_found = True
+        string = string[1:]
+
+    length = len(string)
+
+    counter = 0
+    fixed_string = ''
+    for char in reversed(string):
+        fixed_string += char
+        counter += 1
+        if counter == length:
+            pass
+        elif counter % 3 == 0:
+            fixed_string += ','
+
+    new_string = ''
+    for char in reversed(fixed_string):
+        new_string += char
+
+    if(negative_found):
+        new_string = '-' + new_string
+
+    return new_string
 
 class Addresses:
     def __init__(self,addresses=None,currencies=['USDC','basis','rBasis','USD Coin']):
@@ -47,6 +75,7 @@ class Addresses:
         self.addresses[address].print_data(address,crypto,index)
 
     def add_data_compare_to_previous(self,address,crypto=None, amount=None):
+        #print("Amount: " + str(amount) + "\t" + crypto)
         return self.addresses[address].add_data_compare_to_previous(crypto,amount)
 
 class Address:
@@ -174,6 +203,18 @@ class Address:
         else:
             return self.currency_unknown[index].get_amount()
 
+    def get_account(self,crypto,index = -1):
+        if 'USDC' == crypto:
+            return self.currency_usdc[index].get_account()
+        elif 'basis' == crypto:
+            return self.currency_basis[index].get_account()
+        elif 'rBasis' == crypto:
+            return self.currency_rbasis[index].get_account()
+        elif 'USD Coin' == crypto:
+            return self.currency_usd_coin[index].get_account()
+        else:
+            return self.currency_unknown[index].get_account()
+
     def get_timestamp(self,crypto,index = -1):
         if 'USDC' == crypto:
             return self.currency_usdc[index].get_amount()
@@ -186,21 +227,22 @@ class Address:
         else:
             return self.currency_unknown[index].get_amount()
 
-    def print_data(self,currency,crypto,index):
+    def print_data(self,address,crypto,index):
         if 'USDC' == crypto:
-            self.currency_usdc[index].print_data()
+            self.currency_usdc[index].print_data(address)
         elif 'basis' == crypto:
-            self.currency_basis[index].print_data()
+            self.currency_basis[index].print_data(address)
         elif 'rBasis' == crypto:
-            self.currency_rbasis[index].print_data()
+            self.currency_rbasis[index].print_data(address)
         elif 'USD Coin' == crypto:
-            self.currency_usd_coin[index].print_data()
+            self.currency_usd_coin[index].print_data(address)
         else:
-            self.currency_unknown[index].print_data()
+            self.currency_unknown[index].print_data(address)
 
 class Attributes:
-    def __init__(self, crypto=None, amount=None, timestamp=datetime.datetime.now()):
+    def __init__(self, crypto=None, amount=None, account=None, timestamp=datetime.datetime.now()):
         # Default timestamp to the current timestamp this method was called at
+        # account represents tokenAccount
 
         if type(crypto) == type(None):
             self.crypto = 'Unknown'
@@ -211,6 +253,11 @@ class Attributes:
             self.amount = 0
         else:
             self.amount = amount
+
+        if type(account) == type(None):
+            self.account = 'Unknown'
+        else:
+            self.account = account
 
         if type(timestamp) == type(None):
             self.timestamp = datetime.datetime.now()
@@ -223,8 +270,11 @@ class Attributes:
     def get_amount(self):
         return self.amount
 
+    def get_account(self):
+        return self.account
+
     def get_timestamp(self):
         return self.timestamp
 
-    def print_data(self):
-        print("Crypto:"+self.crypto+'\t'+"Amount:"+str(self.amount)+'\t'+"Timestamp:"+str(self.timestamp))
+    def print_data(self,address):
+        print(address[0:4] + '...' + address[-5:-1]+"\tCrypto:"+self.crypto+'\t'+"Amount:"+add_commas(str(self.amount))+'\t'+"Timestamp:"+str(self.timestamp.strftime("%m/%d/%Y %I:%M:%S %p")))
